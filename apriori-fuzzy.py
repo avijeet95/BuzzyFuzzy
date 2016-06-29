@@ -39,7 +39,33 @@ def returnItemsWithMinSupport(subsetList,minSupport):
 
     return _itemSet
 
+def joinSet(currentLSet,length):
+    pass
 
-#Testing Function
-print returnItemsWithMinSupport([[0,1],[0,2]] , -100)
+
+def runApriori(minSupport,num):
+
+    l = []
+    for i in range(1,num):
+        l.append([i])
+    
+    oneCSet = returnItemsWithMinSupport(l,minSupport)
+
+    currentLSet = oneCSet
+    k = 2
+
+    while(currentLSet != list([])):
+        largeSet[k-1] = currentLSet
+        currentLSet = joinSet(currentLSet, k)
+        currentCSet = returnItemsWithMinSupport(currentLSet,
+                                                transactionList,
+                                                minSupport,
+                                                freqSet)
+        currentLSet = currentCSet
+        k = k + 1
+
+
+    #MAKE JOINSET function
+    # Furthur work on Calculating Confidence
+
 
