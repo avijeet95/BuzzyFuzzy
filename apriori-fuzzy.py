@@ -46,6 +46,7 @@ def joinSet(currentLSet,length):
 def runApriori(minSupport,num):
 
     l = []
+    
     for i in range(1,num):
         l.append([i])
     
@@ -57,10 +58,7 @@ def runApriori(minSupport,num):
     while(currentLSet != list([])):
         largeSet[k-1] = currentLSet
         currentLSet = joinSet(currentLSet, k)
-        currentCSet = returnItemsWithMinSupport(currentLSet,
-                                                transactionList,
-                                                minSupport,
-                                                freqSet)
+        currentCSet = returnItemsWithMinSupport(currentLSet,minSupport)
         currentLSet = currentCSet
         k = k + 1
 
