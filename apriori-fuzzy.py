@@ -9,7 +9,7 @@ from sets import Set
 
 attribute = np.matrix('1 2 -1; 4 5 -3')
 
-def calSupport(itemSet):
+def calSupport(itemSet): # Add attribute matrix as argument
     
     data = []
     totalSum = 0
@@ -34,7 +34,7 @@ def returnItemsWithMinSupport(subsetList,minSupport):
     _itemSet = set()
     #_itemSet would be a set of sets.It would contain those sets from the subsetList which surpass minsupport.
     for x in subsetList:
-        support = calSupport(x)
+        support = calSupport(x) # Add attribute matrix argument
         if support >= minSupport:
             _itemSet.add(x)
 
@@ -46,7 +46,7 @@ def joinSet(currentLSet,length):
 
 
 
-def runApriori(minSupport,num):
+def runApriori(minSupport,minConfidence,num):    #Add attribute matrix as argument
 
     l = set()
     #l is a set of sets. It contains sets of individiual attributes({1},{2},{3},etc.).C1 accd.to apriori.
@@ -66,7 +66,7 @@ def runApriori(minSupport,num):
     while(currentLSet != set([])):
         largeSet[k-1] = currentLSet
         currentLSet = joinSet(currentLSet, k)
-        currentCSet = returnItemsWithMinSupport(currentLSet,minSupport)
+        currentCSet = returnItemsWithMinSupport(currentLSet,minSupport)# add attribute arg.
         currentLSet = currentCSet
         k = k + 1
 
@@ -75,7 +75,7 @@ def runApriori(minSupport,num):
     # Furthur work on Calculating Confidence
     toRetItems = []
     for key, value in largeSet.items():
-        toRetItems.extend([(tuple(item), calSupport(item))
+        toRetItems.extend([(tuple(item), calSupport(item)) # add attribute arg
                            for item in value])
 
     toRetRules = []
@@ -84,10 +84,29 @@ def runApriori(minSupport,num):
             _subsets = map(frozenset, [x for x in subsets(item)])
             for element in _subsets:
                 remain = item.difference(element) 
-                if len(remain) > 0:  #change condition to len(remain)=0 if we want only single element on right side rules.or change remain=num if we want for lst element only.)
-                    confidence = calSupport(item)/calSupport(element)
+                if len(remain) > 0:  #change condition to len(remain)=1 if we want only single element on right side rules.or change remain=num if we want for lst element only.)
+                    confidence = calSupport(item)/calSupport(element) # add attribute arg
                     if confidence >= minConfidence:
                         toRetRules.append(((tuple(element), tuple(remain)),
                                            confidence))
     return toRetItems, toRetRules
+    
+    def printResults(items, rules):
+    """prints the generated itemsets sorted by support and the confidence rules sorted by confidence"""
+    for item, support in sorted(items, key=lambda (item, support): support):
+        print "item: %s , %.3f" % (str(item), support)
+    print "\n------------------------ RULES:"
+    for rule, confidence in sorted(rules, key=lambda (rule, confidence): confidence):
+        pre, post = rule
+        print "Rule: %s ==> %s , %.3f" % (str(pre), str(post), confidence)
+   
+    if __name__ == "__main__":
+
+    minSupport = 0.0
+    minConfidence = 0.0
+    # Import Attribute matrix, make it global or add is at parameter wherever stated.
+
+    items, rules = runApriori (minSupport, minConfidence,num)# add attribute matrix as argument.
+
+    printResults(items, rules)
 
