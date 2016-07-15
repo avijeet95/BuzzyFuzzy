@@ -7,7 +7,11 @@ from optparse import OptionParser
 import numpy as np
 from sets import Set
 
-attribute = np.matrix('1 2 -1; 4 5 -3')
+attribute = np.random.rand(100,5)
+
+def subsets(arr):
+    """ Returns non empty subsets of arr"""
+    return chain(*[combinations(arr, i + 1) for i, a in enumerate(arr)])
 
 def calSupport(itemSet): # Add attribute matrix as argument
     
@@ -16,7 +20,7 @@ def calSupport(itemSet): # Add attribute matrix as argument
     # tempList =[]
 
     for x in itemSet:
-        tempList = np.array(attribute[0: , x])
+        tempList = np.array(attribute[0: , x-1])
         data.append(tempList)
 
     data = np.array(data)
@@ -40,7 +44,7 @@ def returnItemsWithMinSupport(subsetList,minSupport):
 
     return _itemSet
 
-def joinSet(currentLSet,length):
+def joinSet(itemSet,length):
     """Join a set with itself and returns the n-element itemsets""" 
     return set([i.union(j) for i in itemSet for j in itemSet if len(i.union(j)) == length]) 
 
@@ -51,8 +55,8 @@ def runApriori(minSupport,minConfidence,num):    #Add attribute matrix as argume
     l = set()
     #l is a set of sets. It contains sets of individiual attributes({1},{2},{3},etc.).C1 accd.to apriori.
     
-    for i in range(1,num):
-        l.add(set([i]))
+    for i in range(0,num):
+        l.add(frozenset([i+1]))
     
     largeSet=dict()
    # largeSet is a dictionary to store all frequent itemsets, later on used to calculate rules.
@@ -79,19 +83,19 @@ def runApriori(minSupport,minConfidence,num):    #Add attribute matrix as argume
                            for item in value])
 
     toRetRules = []
-    for key, value in largeSet.items()[1:]:
+    for key, value in largeSet.items()[1:]: 
         for item in value:
             _subsets = map(frozenset, [x for x in subsets(item)])
             for element in _subsets:
                 remain = item.difference(element) 
-                if len(remain) > 0:  #change condition to len(remain)=1 if we want only single element on right side rules.or change remain=num if we want for lst element only.)
+                if remain == frozenset([num]):  #change condition to len(remain)=1 if we want only single element on right side rules.or change remain=num if we want for lst element only.)
                     confidence = calSupport(item)/calSupport(element) # add attribute arg
                     if confidence >= minConfidence:
                         toRetRules.append(((tuple(element), tuple(remain)),
                                            confidence))
     return toRetItems, toRetRules
     
-    def printResults(items, rules):
+def printResults(items, rules):
     """prints the generated itemsets sorted by support and the confidence rules sorted by confidence"""
     for item, support in sorted(items, key=lambda (item, support): support):
         print "item: %s , %.3f" % (str(item), support)
@@ -100,12 +104,12 @@ def runApriori(minSupport,minConfidence,num):    #Add attribute matrix as argume
         pre, post = rule
         print "Rule: %s ==> %s , %.3f" % (str(pre), str(post), confidence)
    
-    if __name__ == "__main__":
+if __name__ == "__main__":
 
     minSupport = 0.0
     minConfidence = 0.0
     # Import Attribute matrix, make it global or add is at parameter wherever stated.
-
+    num=5
     items, rules = runApriori (minSupport, minConfidence,num)# add attribute matrix as argument.
 
     printResults(items, rules)
